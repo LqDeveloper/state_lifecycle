@@ -1,4 +1,4 @@
-# StateLifeCycle
+# StateLifecycle
 
 The flutter StateLifecycle enables Flutter to have a page lifecycle like iOS UIViewController and
 Android Activity.

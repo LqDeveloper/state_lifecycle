@@ -1,4 +1,4 @@
-library state_lifecycle;
+library lq_state_lifecycle;
 
 export 'src/context_scroll_extension.dart';
 export 'src/lifecycle_route_observer.dart';
