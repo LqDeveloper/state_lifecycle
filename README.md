@@ -38,6 +38,14 @@ void onResume() {}
 void onPause() {}
 ```
 
+## Add Route observer
+
+```dart
+   MaterialApp(
+      navigatorObservers: [LifecycleRouteObserver.routeObserver],
+    );
+```
+
 ## Normal Page
 
 ```dart
