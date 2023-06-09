@@ -30,7 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  state_lifecycle:
+  lq_state_lifecycle:
     path: ../
 
 

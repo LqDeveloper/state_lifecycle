@@ -1,8 +1,13 @@
+import 'dart:async';
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';
 
 import 'lifecycle_route_observer.dart';
 import 'context_scroll_extension.dart';
+import 'lifecycle_state.dart';
+import 'page_changed_data.dart';
 
 mixin StateLifecycleMixin<T extends StatefulWidget> on State<T>
     implements WidgetsBindingObserver, RouteAware {
@@ -29,13 +34,27 @@ mixin StateLifecycleMixin<T extends StatefulWidget> on State<T>
   ///监听滚动事件
   ScrollNotificationObserverState? _scrollState;
 
+  ///监听生命周期
+  final StreamController<LifecycleState> _streamController =
+      StreamController.broadcast();
+
+  Stream<LifecycleState> get lifecycleStream => _streamController.stream;
+
+  ///监听PageView切换
+  final StreamController<PageChangedData> _pageStreamController =
+      StreamController.broadcast();
+
+  Stream<PageChangedData> get pageStream => _pageStreamController.stream;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     onInit();
+    _streamController.add(LifecycleState.onInit);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       onPostFrame();
+      _streamController.add(LifecycleState.onPostFrame);
       _initPageViewState();
     });
   }
@@ -46,6 +65,7 @@ mixin StateLifecycleMixin<T extends StatefulWidget> on State<T>
     if (!_didRunOnContextReady) {
       _didRunOnContextReady = true;
       onContextReady();
+      _streamController.add(LifecycleState.onContextReady);
     }
 
     ///首次调用时添加路由监听，监听 RouteAware 生命周期
@@ -63,6 +83,9 @@ mixin StateLifecycleMixin<T extends StatefulWidget> on State<T>
     _disposeScrollState();
     _modalRoute = null;
     onDispose();
+    _streamController.add(LifecycleState.onDispose);
+    _streamController.close();
+    _pageStreamController.close();
     super.dispose();
   }
 
@@ -107,6 +130,10 @@ mixin StateLifecycleMixin<T extends StatefulWidget> on State<T>
       } else {
         _notifyViewDisAppear();
       }
+      if (_currentIndex != -1) {
+        _pageStreamController
+            .add(PageChangedData(from: _currentIndex, to: index));
+      }
       _currentIndex = index;
     }
   }
@@ -143,12 +170,14 @@ mixin StateLifecycleMixin<T extends StatefulWidget> on State<T>
     if (_hasAppear) return;
     _hasAppear = true;
     onAppear();
+    _streamController.add(LifecycleState.onAppear);
   }
 
   void _notifyViewDisAppear() {
     if (!_hasAppear) return;
     _hasAppear = false;
     onDisappear();
+    _streamController.add(LifecycleState.onDisappear);
   }
 
   /// ****************************State的生命周期****************************
@@ -206,9 +235,11 @@ mixin StateLifecycleMixin<T extends StatefulWidget> on State<T>
     switch (state) {
       case AppLifecycleState.resumed:
         onResume();
+        _streamController.add(LifecycleState.onResume);
         break;
       case AppLifecycleState.paused:
         onPause();
+        _streamController.add(LifecycleState.onPause);
         break;
       default:
         break;
@@ -239,5 +270,10 @@ mixin StateLifecycleMixin<T extends StatefulWidget> on State<T>
   @override
   Future<bool> didPushRouteInformation(RouteInformation routeInformation) {
     return didPushRoute(routeInformation.location!);
+  }
+
+  @override
+  Future<AppExitResponse> didRequestAppExit() async {
+    return AppExitResponse.exit;
   }
 }

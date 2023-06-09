@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:state_lifecycle/lq_state_lifecycle.dart';
+import 'package:lq_state_lifecycle/lq_state_lifecycle.dart';
 
 void main() {
   runApp(const MyApp());

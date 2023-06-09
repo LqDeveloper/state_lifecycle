@@ -8,10 +8,16 @@ Android Activity.
 1. ContextScrollExtension: Extension of BuildContext.
 2. LifecycleRouteObserver: Listen for routing events.
 3. StateLifecycleMixin : Mixin of State.
+4. LifecycleState: Lifecycle State.
+5. PageChangedData: Observer PageView index.
 
 ## Lifecycle Method
 
 ```dart
+///Observer state lifecycle
+Stream<LifecycleState> get lifecycleStream => _streamController.stream;
+///Observer PageView index.
+Stream<PageChangedData> get pageStream => _pageStreamController.stream;
 
 ///like initState in State
 void onInit() {}
