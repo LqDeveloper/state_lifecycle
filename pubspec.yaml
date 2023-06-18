@@ -1,6 +1,6 @@
 name: lq_state_lifecycle
 description: The flutter StateLifecycle enables Flutter to have a page lifecycle like iOS UIViewController and Android Activity.
-version: 0.0.2
+version: 0.0.3
 homepage: https://github.com/LqDeveloper/state_lifecycle
 
 environment:

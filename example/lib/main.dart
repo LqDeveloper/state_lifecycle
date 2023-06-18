@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lq_state_lifecycle/lq_state_lifecycle.dart';
 
@@ -5,9 +6,14 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with StateLifecycleMixin {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -98,6 +104,12 @@ class _PageOneState extends State<PageOne>
   void onDisappear() {
     super.onDisappear();
     debugPrint("$_pageName ------ onDisappear");
+  }
+
+  @override
+  void onLifecycleStateChanged(LifecycleState state) {
+    super.onLifecycleStateChanged(state);
+    print("$_pageName ---$state");
   }
 }
 
@@ -228,7 +240,10 @@ class _PageFourState extends State<PageFour> with StateLifecycleMixin {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async => true,
+      onWillPop: () async {
+        print("拦截了返回事件");
+        return true;
+      },
       child: Scaffold(
         appBar: AppBar(
           title: Text(_pageName),
@@ -289,14 +304,11 @@ class _PageFourState extends State<PageFour> with StateLifecycleMixin {
   }
 }
 
-class CustomRouter<T> extends MaterialPageRoute<T> {
+class CustomRouter<T> extends CupertinoPageRoute<T> {
   CustomRouter({
     required super.builder,
     super.settings,
     super.maintainState = true,
     super.fullscreenDialog,
   });
-
-  @override
-  bool get hasScopedWillPopCallback => false;
 }
